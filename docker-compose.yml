@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 services:
     web:
         build: ./nginx
@@ -8,25 +8,58 @@ services:
           - php
         volumes:
           - magento:/var/www/magento
-          - magento-vendor:/var/www/magento/vendor
     php:
-        build: ./php
+        env_file: ./.env
+        build:
+          context: ./php
+          args:
+            GIT_URL: ${GIT_URL}
         expose:
           - 9000
         volumes:
           - magento:/var/www/magento
-          - magento-vendor:/var/www/magento/vendor
+          - composer:/root/.composer
         depends_on:
           - db
     db:
         image: mariadb:latest
         expose:
           - 3306
+        ports:
+          - "3337:3306"
+        volumes:
+          - db:/var/lib/mysql
         environment:
           MYSQL_ROOT_PASSWORD: 123123q
           MYSQL_DATABASE: magento
           MYSQL_USER: magento
           MYSQL_PASSWORD: 123123q
+        healthcheck:
+          test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-p123123q"]
+          timeout: 20s
+          retries: 10
+    mailhog:
+        container_name: mailhog
+        image: mailhog/mailhog:latest
+        links:
+          - php
+        ports:
+          - "1025:1025"
+          - "8025:8025"
+    ssh:
+        env_file: ./.env
+        build:
+          context: ./ssh
+          args:
+            ROOTPASS: ${ROOTPASS}
+        ports:
+         - "2222:22"
+        links:
+         - php
+         - web
+        volumes:
+         - magento:/var/www/magento
 volumes:
+    composer:
     magento:
-    magento-vendor:
+    db:
