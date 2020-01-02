@@ -19,7 +19,7 @@ You may want to configure your code changes/sync using ssh connection
  docker-compose up
  # connect using ssh
  ssh -p 2222 root@localhost
- #clean old ssh hash
+ # clean old ssh hash
  ssh-keygen -R [localhost]:2222
  # clean 
  docker-compose down
@@ -27,4 +27,5 @@ You may want to configure your code changes/sync using ssh connection
  docker-compose down --rmi all -v
  # super hard clean
  docker rm -f $(docker ps -q -a)
+ 
  docker rmi -f $(docker images -q)
