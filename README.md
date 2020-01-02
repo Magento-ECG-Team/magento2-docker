@@ -27,4 +27,5 @@ You may want to configure your code changes/sync using ssh connection
  docker-compose down --rmi all -v
  # super hard clean
  docker rm -f $(docker ps -q -a)
+ 
  docker rmi -f $(docker images -q)
